@@ -656,7 +656,7 @@
                 const newCity = prompt("Masukkan nama kota baru:");
                 if (newCity) {
                     const newCountry = prompt("Masukkan negara:");
-                    const newOffset = parseFloat(prompt("Masukkan offset UTC (contoh: 7 untuk WIB):"));
+                    const newOffset = parseFloat(prompt("Masukkan offset +UTC (contoh: +7 untuk WIB):"));
                     
                     if (newCountry && !isNaN(newOffset)) {
                         const newZone = {

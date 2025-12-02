@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Clock - Jam Dunia</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+        
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #4cc9f0, #4361ee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            color: #b8c1ec;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .search-box {
+            position: relative;
+            flex-grow: 1;
+            max-width: 400px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 14px 20px 14px 50px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 20px rgba(76, 201, 240, 0.3);
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #b8c1ec;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            background: rgba(67, 97, 238, 0.7);
+            transform: translateY(-2px);
+        }
+        
+        .btn.active {
+            background: linear-gradient(to right, #4361ee, #4cc9f0);
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .clock-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .clock-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(76, 201, 240, 0.2);
+            border-color: rgba(76, 201, 240, 0.3);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .location {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .city {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .country {
+            color: #b8c1ec;
+            font-size: 0.9rem;
+        }
+        
+        .flag {
+            font-size: 2.5rem;
+        }
+        
+        .time-display {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .time {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
+        }
+        
+        .date {
+            color: #b8c1ec;
+            font-size: 1rem;
+        }
+        
+        .timezone {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #b8c1ec;
+        }
+        
+        .timezone span {
+            background: rgba(67, 97, 238, 0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+        
+        .difference {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .difference.positive {
+            color: #4ade80;
+        }
+        
+        .difference.negative {
+            color: #f87171;
+        }
+        
+        .world-map {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .map-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #4cc9f0;
+        }
+        
+        .map-container {
+            height: 300px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .map-point {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #4cc9f0;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px #4cc9f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .map-point:hover {
+            transform: translate(-50%, -50%) scale(1.5);
+        }
+        
+        .map-point.active {
+            background: #f72585;
+            box-shadow: 0 0 15px #f72585;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #b8c1ec;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .highlight {
+            color: #4cc9f0;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+            
+            header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .search-box {
+                max-width: 100%;
+            }
+            
+            .time {
+                font-size: 2.2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .clock-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-globe-americas"></i> World Clock [Beta]</h1>
+            <p>Pantau waktu di seluruh dunia dengan mudah. Tambahkan kota favorit Anda, bandingkan zona waktu, dan lihat perbedaan waktu secara real-time.</p>
+        </header>
+        
+        <div class="controls">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Cari kota atau negara...">
+            </div>
+            
+            <div class="filter-buttons">
+                <button class="btn active" id="filterAll">
+                    <i class="fas fa-globe"></i> Semua
+                </button>
+                <button class="btn" id="filterFavorites">
+                    <i class="fas fa-star"></i> Favorit
+                </button>
+                <button class="btn" id="addCity">
+                    <i class="fas fa-plus"></i> Tambah Kota
+                </button>
+                <button class="btn" id="compareTime">
+                    <i class="fas fa-exchange-alt"></i> Bandingkan Waktu
+                </button>
+            </div>
+        </div>
+        
+        <div class="main-content" id="clocksContainer">
+            <!-- Kartu jam akan di-generate oleh JavaScript -->
+        </div>
+        
+        <div class="world-map">
+            <h2 class="map-title">Peta Zona Waktu Dunia</h2>
+            <div class="map-container" id="worldMap">
+                <!-- Titik peta akan di-generate oleh JavaScript -->
+                <div class="map-point" style="top: 30%; left: 20%;" data-city="New York"></div>
+                <div class="map-point" style="top: 35%; left: 50%;" data-city="London"></div>
+                <div class="map-point" style="top: 40%; left: 75%;" data-city="Tokyo"></div>
+                <div class="map-point" style="top: 65%; left: 75%;" data-city="Sydney"></div>
+                <div class="map-point" style="top: 45%; left: 65%;" data-city="Jakarta"></div>
+                <div class="map-point active" style="top: 50%; left: 50%;" data-city="UTC"></div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Dibuat dengan <i class="fas fa-heart highlight"></i> menggunakan HTML, CSS, dan JavaScript</p>
+            <p>Waktu saat ini di lokasi Anda: <span id="localTime" class="highlight"></span></p>
+            <p>© 2025 World Clock. Semua zona waktu diperbarui secara real-time.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Data zona waktu dunia (kota, offset UTC, bendera)
+        const timeZones = [
+            { city: "Jakarta", country: "Indonesia", timezone: "Asia/Jakarta", offset: 7, flag: "🇮🇩", favorite: true },
+            { city: "London", country: "Inggris", timezone: "Europe/London", offset: 0, flag: "🇬🇧", favorite: false },
+            { city: "New York", country: "Amerika Serikat", timezone: "America/New_York", offset: -5, flag: "🇺🇸", favorite: true },
+            { city: "Tokyo", country: "Jepang", timezone: "Asia/Tokyo", offset: 9, flag: "🇯🇵", favorite: false },
+            { city: "Sydney", country: "Australia", timezone: "Australia/Sydney", offset: 11, flag: "🇦🇺", favorite: false },
+            { city: "Paris", country: "Prancis", timezone: "Europe/Paris", offset: 1, flag: "🇫🇷", favorite: false },
+            { city: "Dubai", country: "UEA", timezone: "Asia/Dubai", offset: 4, flag: "🇦🇪", favorite: false },
+            { city: "Moscow", country: "Rusia", timezone: "Europe/Moscow", offset: 3, flag: "🇷🇺", favorite: false },
+            { city: "Beijing", country: "China", timezone: "Asia/Shanghai", offset: 8, flag: "🇨🇳", favorite: false },
+            { city: "UTC", country: "Waktu Universal", timezone: "UTC", offset: 0, flag: "🌐", favorite: true },
+            { city: "Singapore", country: "Singapura", timezone: "Asia/Singapore", offset: 8, flag: "🇸🇬", favorite: false },
+            { city: "Cairo", country: "Mesir", timezone: "Africa/Cairo", offset: 2, flag: "🇪🇬", favorite: false },
+            { city: "Mumbai", country: "India", timezone: "Asia/Kolkata", offset: 5.5, flag: "🇮🇳", favorite: false },
+            { city: "Brasília", country: "Brazil", timezone: "America/Sao_Paulo", offset: -3, flag: "🇧🇷", favorite: false },
+            { city: "Mexico City", country: "Meksiko", timezone: "America/Mexico_City", offset: -6, flag: "🇲🇽", favorite: false }
+        ];
+
+        // Data tambahan untuk peta
+        const mapPoints = [
+            { city: "New York", top: "30%", left: "20%" },
+            { city: "London", top: "35%", left: "50%" },
+            { city: "Tokyo", top: "40%", left: "75%" },
+            { city: "Sydney", top: "65%", left: "75%" },
+            { city: "Jakarta", top: "45%", left: "65%" },
+            { city: "UTC", top: "50%", left: "50%" },
+            { city: "Paris", top: "37%", left: "52%" },
+            { city: "Dubai", top: "42%", left: "60%" },
+            { city: "Moscow", top: "33%", left: "58%" },
+            { city: "Beijing", top: "40%", left: "70%" },
+            { city: "Singapore", top: "48%", left: "68%" },
+            { city: "Cairo", top: "42%", left: "55%" },
+            { city: "Mumbai", top: "45%", left: "62%" },
+            { city: "Brasília", top: "60%", left: "30%" },
+            { city: "Mexico City", top: "45%", left: "18%" }
+        ];
+
+        // Variabel global
+        let favorites = JSON.parse(localStorage.getItem('worldClockFavorites')) || ["Jakarta", "New York", "UTC"];
+        let showingFavorites = false;
+        let localTimeOffset = new Date().getTimezoneOffset() / -60; // Offset waktu lokal dalam jam
+
+        // Inisialisasi
+        document.addEventListener('DOMContentLoaded', function() {
+            renderClocks(timeZones);
+            updateLocalTime();
+            setupEventListeners();
+            setupMapPoints();
+            
+            // Update waktu setiap detik
+            setInterval(() => {
+                updateAllClocks();
+                updateLocalTime();
+            }, 1000);
+        });
+
+        // Render kartu jam
+        function renderClocks(zones) {
+            const container = document.getElementById('clocksContainer');
+            container.innerHTML = '';
+            
+            zones.forEach(zone => {
+                const time = getCurrentTime(zone.timezone);
+                const date = getCurrentDate(zone.timezone);
+                const timeDiff = calculateTimeDifference(zone.offset);
+                
+                const card = document.createElement('div');
+                card.className = 'clock-card';
+                card.dataset.city = zone.city;
+                
+                // Tentukan jika kota ini favorit
+                const isFavorite = favorites.includes(zone.city);
+                
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="location">
+                            <div class="city">${zone.city}</div>
+                            <div class="country">${zone.country}</div>
+                        </div>
+                        <div class="flag">${zone.flag}</div>
+                    </div>
+                    <div class="time-display">
+                        <div class="time">${time}</div>
+                        <div class="date">${date}</div>
+                    </div>
+                    <div class="timezone">
+                        <div>UTC ${zone.offset >= 0 ? '+' : ''}${zone.offset}</div>
+                        <div class="difference ${timeDiff.diffClass}">
+                            <i class="fas ${timeDiff.icon}"></i>
+                            ${timeDiff.text}
+                        </div>
+                    </div>
+                `;
+                
+                // Tambahkan tombol favorit
+                const favoriteBtn = document.createElement('button');
+                favoriteBtn.className = 'btn';
+                favoriteBtn.style.cssText = 'position: absolute; top: 20px; right: 20px; padding: 8px; border-radius: 50%;';
+                favoriteBtn.innerHTML = `<i class="fas ${isFavorite ? 'fa-star' : 'fa-star'}"></i>`;
+                favoriteBtn.style.color = isFavorite ? '#FFD700' : '#b8c1ec';
+                
+                favoriteBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleFavorite(zone.city);
+                    renderClocks(showingFavorites ? timeZones.filter(z => favorites.includes(z.city)) : timeZones);
+                });
+                
+                card.appendChild(favoriteBtn);
+                container.appendChild(card);
+            });
+        }
+
+        // Update semua jam
+        function updateAllClocks() {
+            const timeElements = document.querySelectorAll('.time');
+            const dateElements = document.querySelectorAll('.date');
+            const diffElements = document.querySelectorAll('.difference');
+            
+            const cards = document.querySelectorAll('.clock-card');
+            
+            cards.forEach((card, index) => {
+                const cityName = card.dataset.city;
+                const zone = timeZones.find(z => z.city === cityName);
+                
+                if (zone) {
+                    timeElements[index].textContent = getCurrentTime(zone.timezone);
+                    dateElements[index].textContent = getCurrentDate(zone.timezone);
+                    
+                    const timeDiff = calculateTimeDifference(zone.offset);
+                    diffElements[index].innerHTML = `<i class="fas ${timeDiff.icon}"></i> ${timeDiff.text}`;
+                    diffElements[index].className = `difference ${timeDiff.diffClass}`;
+                }
+            });
+        }
+
+        // Dapatkan waktu saat ini untuk zona waktu tertentu
+        function getCurrentTime(timezone) {
+            const options = { 
+                timeZone: timezone, 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            
+            try {
+                return new Date().toLocaleTimeString('id-ID', options);
+            } catch {
+                // Fallback untuk zona waktu yang tidak valid
+                const utcTime = new Date().getTime();
+                const localOffset = new Date().getTimezoneOffset() * 60000;
+                const targetOffset = timeZones.find(tz => tz.timezone === timezone)?.offset || 0;
+                const targetTime = new Date(utcTime + localOffset + (targetOffset * 3600000));
+                
+                return targetTime.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }
+        }
+
+        // Dapatkan tanggal saat ini untuk zona waktu tertentu
+        function getCurrentDate(timezone) {
+            const options = { 
+                timeZone: timezone, 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            
+            try {
+                return new Date().toLocaleDateString('id-ID', options);
+            } catch {
+                // Fallback untuk zona waktu yang tidak valid
+                return new Date().toLocaleDateString('id-ID', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+            }
+        }
+
+        // Hitung perbedaan waktu dengan waktu lokal
+        function calculateTimeDifference(offset) {
+            const diff = offset - localTimeOffset;
+            
+            if (diff === 0) {
+                return {
+                    text: "Waktu sama",
+                    icon: "fa-equals",
+                    diffClass: ""
+                };
+            } else if (diff > 0) {
+                return {
+                    text: `+${diff} jam`,
+                    icon: "fa-arrow-up",
+                    diffClass: "positive"
+                };
+            } else {
+                return {
+                    text: `${diff} jam`,
+                    icon: "fa-arrow-down",
+                    diffClass: "negative"
+                };
+            }
+        }
+
+        // Update waktu lokal di footer
+        function updateLocalTime() {
+            const now = new Date();
+            const localTime = now.toLocaleTimeString('id-ID', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            const localDate = now.toLocaleDateString('id-ID', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            document.getElementById('localTime').textContent = `${localDate}, ${localTime}`;
+        }
+
+        // Toggle status favorit
+        function toggleFavorite(city) {
+            const index = favorites.indexOf(city);
+            
+            if (index === -1) {
+                favorites.push(city);
+            } else {
+                favorites.splice(index, 1);
+            }
+            
+            localStorage.setItem('worldClockFavorites', JSON.stringify(favorites));
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Filter semua
+            document.getElementById('filterAll').addEventListener('click', function() {
+                showingFavorites = false;
+                document.getElementById('filterAll').classList.add('active');
+                document.getElementById('filterFavorites').classList.remove('active');
+                renderClocks(timeZones);
+            });
+            
+            // Filter favorit
+            document.getElementById('filterFavorites').addEventListener('click', function() {
+                showingFavorites = true;
+                document.getElementById('filterFavorites').classList.add('active');
+                document.getElementById('filterAll').classList.remove('active');
+                const filtered = timeZones.filter(zone => favorites.includes(zone.city));
+                renderClocks(filtered);
+            });
+            
+            // Pencarian
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                
+                if (searchTerm === '') {
+                    renderClocks(showingFavorites ? 
+                        timeZones.filter(z => favorites.includes(z.city)) : 
+                        timeZones);
+                    return;
+                }
+                
+                const filtered = timeZones.filter(zone => 
+                    zone.city.toLowerCase().includes(searchTerm) || 
+                    zone.country.toLowerCase().includes(searchTerm)
+                );
+                
+                renderClocks(filtered);
+            });
+            
+            // Tambah kota (simulasi)
+            document.getElementById('addCity').addEventListener('click', function() {
+                const newCity = prompt("Masukkan nama kota baru:");
+                if (newCity) {
+                    const newCountry = prompt("Masukkan negara:");
+                    const newOffset = parseFloat(prompt("Masukkan offset UTC (contoh: 7 untuk WIB):"));
+                    
+                    if (newCountry && !isNaN(newOffset)) {
+                        const newZone = {
+                            city: newCity,
+                            country: newCountry,
+                            timezone: "UTC", // Simulasi
+                            offset: newOffset,
+                            flag: "🏳️",
+                            favorite: false
+                        };
+                        
+                        timeZones.push(newZone);
+                        renderClocks(timeZones);
+                        alert(`Kota ${newCity} telah ditambahkan!`);
+                    }
+                }
+            });
+            
+            // Bandingkan waktu (simulasi)
+            document.getElementById('compareTime').addEventListener('click', function() {
+                alert("Fitur perbandingan waktu: Pilih dua kota untuk melihat perbedaan waktunya. (Fitur Ini sedang dalam perbaikan mohon maaf:D )");
+            });
+        }
+
+        // Setup titik peta interaktif
+        function setupMapPoints() {
+            const mapPoints = document.querySelectorAll('.map-point');
+            mapPoints.forEach(point => {
+                point.addEventListener('click', function() {
+                    // Hapus kelas active dari semua titik
+                    document.querySelectorAll('.map-point').forEach(p => {
+                        p.classList.remove('active');
+                    });
+                    
+                    // Tambah kelas active ke titik yang diklik
+                    this.classList.add('active');
+                    
+                    // Cari dan tampilkan kota yang dipilih
+                    const cityName = this.dataset.city;
+                    const cityZone = timeZones.find(z => z.city === cityName);
+                    
+                    if (cityZone) {
+                        // Scroll ke kota yang dipilih
+                        const cityCard = document.querySelector(`[data-city="${cityName}"]`);
+                        if (cityCard) {
+                            cityCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            
+                            // Efek highlight
+                            cityCard.style.boxShadow = '0 0 20px rgba(247, 37, 133, 0.7)';
+                            setTimeout(() => {
+                                cityCard.style.boxShadow = '';
+                            }, 2000);
+                        }
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
